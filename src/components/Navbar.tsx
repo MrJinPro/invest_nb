@@ -6,12 +6,15 @@ import {
   Menu, 
   X, 
   ChevronRight,
-  Sparkles
+  Sparkles,
+  Inbox
 } from 'lucide-react';
+import { getLeads } from '../data/leadsStore';
 
 interface NavbarProps {
   onOpenMemorandum: () => void;
   onOpenSchedule: () => void;
+  onOpenLeadsModal?: () => void;
 }
 
 export const NAV_ITEMS = [
@@ -26,10 +29,22 @@ export const NAV_ITEMS = [
   { label: 'Контакты', href: '#contacts' },
 ];
 
-export const Navbar: React.FC<NavbarProps> = ({ onOpenMemorandum, onOpenSchedule }) => {
+export const Navbar: React.FC<NavbarProps> = ({ onOpenMemorandum, onOpenSchedule, onOpenLeadsModal }) => {
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState('overview');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [leadsCount, setLeadsCount] = useState(0);
+
+  const refreshLeadsCount = () => {
+    const leads = getLeads();
+    setLeadsCount(leads.length);
+  };
+
+  useEffect(() => {
+    refreshLeadsCount();
+    window.addEventListener('novaboost_leads_updated', refreshLeadsCount);
+    return () => window.removeEventListener('novaboost_leads_updated', refreshLeadsCount);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -132,7 +147,23 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenMemorandum, onOpenSchedule
           </nav>
 
           {/* Action Buttons */}
-          <div className="hidden sm:flex items-center gap-2.5">
+          <div className="hidden sm:flex items-center gap-2">
+            {onOpenLeadsModal && (
+              <button
+                onClick={onOpenLeadsModal}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 transition-all duration-200 active:scale-95 cursor-pointer relative"
+                title="Панель Заявок"
+              >
+                <Inbox className="w-3.5 h-3.5 text-cyan-400" />
+                <span>Заявки</span>
+                {leadsCount > 0 && (
+                  <span className="px-1.5 py-0.2 rounded-full bg-cyan-400 text-slate-950 font-extrabold text-[10px]">
+                    {leadsCount}
+                  </span>
+                )}
+              </button>
+            )}
+
             <button
               onClick={onOpenMemorandum}
               className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-medium bg-white/5 hover:bg-white/10 text-slate-200 border border-white/10 hover:border-cyan-500/30 transition-all duration-200 active:scale-95 cursor-pointer"

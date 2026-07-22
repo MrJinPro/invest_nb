@@ -14,17 +14,22 @@ import {
   PhoneCall,
   Copy,
   Check,
-  Video
+  Video,
+  ExternalLink,
+  Inbox
 } from 'lucide-react';
 import { FOUNDER_INFO } from '../data/novaboost-data';
+import { addLead, generateTelegramLink, generateMailtoLink, Lead } from '../data/leadsStore';
 
 interface ContactSectionProps {
   onOpenSchedule: () => void;
+  onOpenLeadsModal?: () => void;
   initialInvestmentAmount?: number;
 }
 
 export const ContactSection: React.FC<ContactSectionProps> = ({ 
   onOpenSchedule, 
+  onOpenLeadsModal,
   initialInvestmentAmount 
 }) => {
   const [formData, setFormData] = useState({
@@ -40,6 +45,8 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
+  const [lastCreatedLead, setLastCreatedLead] = useState<Lead | null>(null);
+  const [copiedSummary, setCopiedSummary] = useState(false);
 
   // Simple math CAPTCHA challenge
   const [captchaNum1] = useState(4);
@@ -72,21 +79,42 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
 
     setStatus('submitting');
 
-    // Simulate direct form transmission
+    // Create lead in local & server database
+    const newLead = addLead({
+      type: 'investment',
+      name: formData.name.trim(),
+      email: formData.email.trim(),
+      company: formData.company.trim(),
+      investmentAmount: formData.investmentAmount,
+      message: formData.message.trim()
+    });
+
+    setLastCreatedLead(newLead);
+
     setTimeout(() => {
       setStatus('success');
       
-      // Fire confetti burst!
       try {
         confetti({
           particleCount: 100,
           spread: 70,
           origin: { y: 0.6 }
         });
-      } catch (err) {
-        // Fallback if confetti fails
-      }
-    }, 1000);
+      } catch (err) {}
+    }, 600);
+  };
+
+  const copyLeadSummaryText = () => {
+    if (!lastCreatedLead) return;
+    const text = `Инвестиционная заявка NovaBoost Seed Round 2026:
+Имя: ${formData.name}
+Email: ${formData.email}
+Сумма билета: $${formData.investmentAmount.toLocaleString()} USD
+Компания: ${formData.company || '—'}
+Сообщение: ${formData.message || '—'}`;
+    navigator.clipboard.writeText(text);
+    setCopiedSummary(true);
+    setTimeout(() => setCopiedSummary(false), 2000);
   };
 
   return (
@@ -249,23 +277,70 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                 <motion.div 
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="p-8 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-center space-y-4"
+                  className="p-6 sm:p-8 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-center space-y-5"
                 >
-                  <div className="w-14 h-14 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto">
+                  <div className="w-14 h-14 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto border border-emerald-500/30">
                     <CheckCircle2 className="w-8 h-8" />
                   </div>
-                  <div className="space-y-1">
-                    <h4 className="text-xl font-bold text-white font-['Outfit']">Заявка успешно отправлена!</h4>
+                  
+                  <div className="space-y-1.5">
+                    <h4 className="text-xl font-bold text-white font-['Outfit']">Заявка Зарегистрирована в Реестре!</h4>
                     <p className="text-xs text-slate-300 max-w-md mx-auto leading-relaxed">
-                      Заявка напрямую перенаправлена Основателю на почту <strong className="text-cyan-300">admin@novaboost.cloud</strong> и в Telegram <strong className="text-cyan-300">@MrJinPro</strong>. Основатель ответит вам в течение 24 часов.
+                      Ваша заявка на <strong className="text-cyan-300">${formData.investmentAmount.toLocaleString()} USD</strong> зафиксирована в базе. Чтобы гарантированно уведомить Основателя, отправьте сообщение прямо сейчас:
                     </p>
                   </div>
-                  <button
-                    onClick={() => setStatus('idle')}
-                    className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold cursor-pointer"
-                  >
-                    Отправить еще одну заявку
-                  </button>
+
+                  {lastCreatedLead && (
+                    <div className="space-y-2 pt-2 max-w-md mx-auto text-left">
+                      <a
+                        href={generateTelegramLink(lastCreatedLead)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full py-3.5 px-4 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs shadow-lg shadow-cyan-500/25 flex items-center justify-center gap-2 transition-all cursor-pointer"
+                      >
+                        <Send className="w-4 h-4" />
+                        <span>💬 Отправить в Telegram Основателю (@MrJinPro)</span>
+                        <ExternalLink className="w-3.5 h-3.5 opacity-70" />
+                      </a>
+
+                      <a
+                        href={generateMailtoLink(lastCreatedLead)}
+                        className="w-full py-3 px-4 rounded-xl bg-white/10 hover:bg-white/15 text-white font-semibold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer border border-white/10"
+                      >
+                        <Mail className="w-4 h-4 text-indigo-400" />
+                        <span>✉️ Отправить письмо на admin@novaboost.cloud</span>
+                      </a>
+
+                      <div className="flex items-center gap-2 pt-1">
+                        <button
+                          onClick={copyLeadSummaryText}
+                          className="flex-1 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 text-xs font-medium flex items-center justify-center gap-1.5 cursor-pointer"
+                        >
+                          {copiedSummary ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                          <span>{copiedSummary ? 'Скопировано!' : 'Скопировать текст'}</span>
+                        </button>
+
+                        {onOpenLeadsModal && (
+                          <button
+                            onClick={onOpenLeadsModal}
+                            className="py-2 px-3 rounded-xl bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/30 text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
+                          >
+                            <Inbox className="w-3.5 h-3.5" />
+                            <span>Реестр Заявок</span>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="pt-2">
+                    <button
+                      onClick={() => setStatus('idle')}
+                      className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 text-xs font-medium cursor-pointer"
+                    >
+                      Подать еще одну заявку
+                    </button>
+                  </div>
                 </motion.div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-4">

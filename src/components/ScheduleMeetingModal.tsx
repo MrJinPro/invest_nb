@@ -11,9 +11,12 @@ import {
   Mail, 
   Video, 
   Sparkles,
-  DollarSign
+  DollarSign,
+  ExternalLink,
+  Copy,
+  Check
 } from 'lucide-react';
-import { FOUNDER_INFO } from '../data/novaboost-data';
+import { addLead, generateTelegramLink, generateMailtoLink, Lead } from '../data/leadsStore';
 
 interface ScheduleMeetingModalProps {
   isOpen: boolean;
@@ -30,7 +33,10 @@ export const ScheduleMeetingModal: React.FC<ScheduleMeetingModalProps> = ({
   const [selectedTime, setSelectedTime] = useState<string>('15:00 UTC');
   const [userName, setUserName] = useState<string>('');
   const [userEmail, setUserEmail] = useState<string>('');
+  const [userTelegram, setUserTelegram] = useState<string>('');
   const [isBooked, setIsBooked] = useState<boolean>(false);
+  const [createdLead, setCreatedLead] = useState<Lead | null>(null);
+  const [copiedText, setCopiedText] = useState<boolean>(false);
 
   if (!isOpen) return null;
 
@@ -40,6 +46,18 @@ export const ScheduleMeetingModal: React.FC<ScheduleMeetingModalProps> = ({
     e.preventDefault();
     if (!userName || !userEmail) return;
 
+    const lead = addLead({
+      type: 'meeting',
+      name: userName,
+      email: userEmail,
+      telegram: userTelegram,
+      selectedDate,
+      selectedTime,
+      investmentAmount: selectedAmount || 10000,
+      message: `Запись на 1-on-1 созвон на ${selectedDate} в ${selectedTime}`
+    });
+
+    setCreatedLead(lead);
     setIsBooked(true);
 
     try {
@@ -49,6 +67,19 @@ export const ScheduleMeetingModal: React.FC<ScheduleMeetingModalProps> = ({
         origin: { y: 0.5 }
       });
     } catch (err) {}
+  };
+
+  const copyLeadSummary = () => {
+    if (!createdLead) return;
+    const summary = `Запись на созвон NovaBoost Seed Round 2026:
+Имя: ${userName}
+Email: ${userEmail}
+Telegram: ${userTelegram || 'Не указан'}
+Дата и время: ${selectedDate} в ${selectedTime}
+Билет: $${(selectedAmount || 10000).toLocaleString()} USD`;
+    navigator.clipboard.writeText(summary);
+    setCopiedText(true);
+    setTimeout(() => setCopiedText(false), 2000);
   };
 
   return (
@@ -85,25 +116,58 @@ export const ScheduleMeetingModal: React.FC<ScheduleMeetingModalProps> = ({
           </div>
 
           {isBooked ? (
-            <div className="py-8 text-center space-y-4">
+            <div className="py-4 text-center space-y-5">
               <div className="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto border border-emerald-500/30">
                 <CheckCircle2 className="w-10 h-10" />
               </div>
-              <div className="space-y-1">
-                <h4 className="text-2xl font-bold text-white font-['Outfit']">Встреча Запланирована!</h4>
-                <p className="text-xs text-slate-300 max-w-md mx-auto">
-                  Подтверждение и ссылка на Google Meet / Zoom отправлены на адрес <span className="text-cyan-300 font-bold">{userEmail}</span>.
+              
+              <div className="space-y-1.5">
+                <h4 className="text-2xl font-bold text-white font-['Outfit']">Запись Зарегистрирована!</h4>
+                <p className="text-xs text-slate-300 max-w-md mx-auto leading-relaxed">
+                  Заявка сохранена в Панели Заявок проекта. Для гарантированного созвона отправьте уведомление напрямую Основателю:
                 </p>
-                <p className="text-xs font-mono text-cyan-400 pt-2">
-                  Дата: {selectedDate} в {selectedTime}
-                </p>
+                <div className="p-3 rounded-xl bg-cyan-500/10 border border-cyan-500/20 font-mono text-xs text-cyan-300 inline-block mt-2">
+                  🗓️ {selectedDate} в {selectedTime}
+                </div>
               </div>
+
+              {/* Direct Action Buttons */}
+              {createdLead && (
+                <div className="space-y-2 pt-2">
+                  <a
+                    href={generateTelegramLink(createdLead)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full py-3.5 px-4 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs shadow-lg shadow-cyan-500/25 flex items-center justify-center gap-2 transition-all cursor-pointer"
+                  >
+                    <Send className="w-4 h-4" />
+                    <span>💬 Отправить в Telegram Основателю (@MrJinPro)</span>
+                    <ExternalLink className="w-3.5 h-3.5 opacity-70" />
+                  </a>
+
+                  <a
+                    href={generateMailtoLink(createdLead)}
+                    className="w-full py-3 rounded-xl bg-white/10 hover:bg-white/15 text-white font-semibold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer border border-white/10"
+                  >
+                    <Mail className="w-4 h-4 text-indigo-400" />
+                    <span>✉️ Отправить письмо на admin@novaboost.cloud</span>
+                  </a>
+
+                  <button
+                    onClick={copyLeadSummary}
+                    className="w-full py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 text-xs font-medium flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    {copiedText ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+                    <span>{copiedText ? 'Текст Скопирован!' : 'Скопировать детали записи'}</span>
+                  </button>
+                </div>
+              )}
 
               <button
                 onClick={onClose}
-                className="mt-4 px-6 py-2.5 rounded-xl bg-cyan-500 text-white font-bold text-xs cursor-pointer"
+                className="mt-2 px-6 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 text-xs cursor-pointer"
               >
-                Закрыть
+                Закрыть окно
               </button>
             </div>
           ) : (
@@ -143,7 +207,7 @@ export const ScheduleMeetingModal: React.FC<ScheduleMeetingModalProps> = ({
               {/* Inputs */}
               <div className="space-y-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-medium text-slate-300">Ваше Имя</label>
+                  <label className="text-xs font-medium text-slate-300">Ваше Имя *</label>
                   <input
                     type="text"
                     required
@@ -154,16 +218,29 @@ export const ScheduleMeetingModal: React.FC<ScheduleMeetingModalProps> = ({
                   />
                 </div>
 
-                <div className="space-y-1">
-                  <label className="text-xs font-medium text-slate-300">Ваш Email</label>
-                  <input
-                    type="email"
-                    required
-                    placeholder="investor@domain.com"
-                    value={userEmail}
-                    onChange={(e) => setUserEmail(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl bg-white/[0.04] border border-white/10 text-white text-xs focus:outline-none focus:border-cyan-400"
-                  />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <label className="text-xs font-medium text-slate-300">Ваш Email *</label>
+                    <input
+                      type="email"
+                      required
+                      placeholder="investor@domain.com"
+                      value={userEmail}
+                      onChange={(e) => setUserEmail(e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-xl bg-white/[0.04] border border-white/10 text-white text-xs focus:outline-none focus:border-cyan-400"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-xs font-medium text-slate-300">Telegram / Телефон (опционально)</label>
+                    <input
+                      type="text"
+                      placeholder="@username или +7..."
+                      value={userTelegram}
+                      onChange={(e) => setUserTelegram(e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-xl bg-white/[0.04] border border-white/10 text-white text-xs focus:outline-none focus:border-cyan-400"
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -173,7 +250,7 @@ export const ScheduleMeetingModal: React.FC<ScheduleMeetingModalProps> = ({
                 className="w-full py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white text-xs font-bold shadow-lg shadow-cyan-500/20 flex items-center justify-center gap-2 cursor-pointer"
               >
                 <Calendar className="w-4 h-4" />
-                <span>Подтвердить запись на звонок</span>
+                <span>Забронировать созвон с Основателем</span>
               </button>
 
             </form>
@@ -184,3 +261,4 @@ export const ScheduleMeetingModal: React.FC<ScheduleMeetingModalProps> = ({
     </AnimatePresence>
   );
 };
+

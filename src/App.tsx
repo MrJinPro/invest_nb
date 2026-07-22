@@ -21,11 +21,13 @@ import { ContactSection } from './components/ContactSection';
 import { Footer } from './components/Footer';
 import { MemorandumModal } from './components/MemorandumModal';
 import { ScheduleMeetingModal } from './components/ScheduleMeetingModal';
+import { LeadsAdminModal } from './components/LeadsAdminModal';
 import { DocumentItem } from './data/novaboost-data';
 
 export default function App() {
   const [isMemorandumOpen, setIsMemorandumOpen] = useState<boolean>(false);
   const [isScheduleOpen, setIsScheduleOpen] = useState<boolean>(false);
+  const [isLeadsOpen, setIsLeadsOpen] = useState<boolean>(false);
   const [selectedDocument, setSelectedDocument] = useState<DocumentItem | null>(null);
   const [selectedCalcAmount, setSelectedCalcAmount] = useState<number | undefined>(undefined);
 
@@ -52,6 +54,7 @@ export default function App() {
       <Navbar 
         onOpenMemorandum={() => handleOpenMemorandum()} 
         onOpenSchedule={() => handleOpenSchedule()} 
+        onOpenLeadsModal={() => setIsLeadsOpen(true)}
       />
 
       {/* Main Content Sections */}
@@ -105,6 +108,7 @@ export default function App() {
         {/* 13. Contacts & Founder Feedback Form */}
         <ContactSection 
           onOpenSchedule={() => handleOpenSchedule()} 
+          onOpenLeadsModal={() => setIsLeadsOpen(true)}
           initialInvestmentAmount={selectedCalcAmount}
         />
       </main>
@@ -123,6 +127,11 @@ export default function App() {
         isOpen={isScheduleOpen} 
         onClose={() => setIsScheduleOpen(false)} 
         selectedAmount={selectedCalcAmount}
+      />
+
+      <LeadsAdminModal
+        isOpen={isLeadsOpen}
+        onClose={() => setIsLeadsOpen(false)}
       />
 
     </div>
