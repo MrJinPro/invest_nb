@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="og-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#050811"/>
+      <stop offset="50%" stop-color="#0a0f1d"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="og-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#22d3ee"/>
+      <stop offset="50%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#818cf8"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#og-bg)"/>
+  
+  <!-- Grid pattern overlay -->
+  <g opacity="0.05" stroke="#ffffff" stroke-width="1">
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <rect width="40" height="40" fill="none"/>
+      <path d="M 40 0 L 0 0 0 40"/>
+    </pattern>
+    <rect width="1200" height="630" fill="url(#grid)"/>
+  </g>
+
+  <!-- Glowing background circles -->
+  <circle cx="200" cy="150" r="250" fill="#06b6d4" opacity="0.12" filter="blur(60px)"/>
+  <circle cx="1000" cy="480" r="300" fill="#6366f1" opacity="0.15" filter="blur(80px)"/>
+
+  <!-- Logo Mark -->
+  <g transform="translate(100, 180)">
+    <!-- Icon Box -->
+    <rect width="110" height="110" rx="28" fill="#090f1d" stroke="url(#og-grad)" stroke-width="3"/>
+    <path d="M 30 85 L 30 25 L 45 25 L 45 85 Z" fill="#22d3ee"/>
+    <path d="M 45 25 L 75 85 L 85 85 L 55 25 Z" fill="#38bdf8"/>
+    <path d="M 70 25 L 85 25 L 85 85 L 70 85 Z" fill="#818cf8"/>
+  </g>
+
+  <!-- Main Titles -->
+  <text x="240" y="230" fill="#ffffff" font-family="'Outfit', sans-serif" font-weight="800" font-size="56" letter-spacing="-1">NovaBoost Ecosystem</text>
+  <text x="240" y="275" fill="#38bdf8" font-family="'JetBrains Mono', monospace" font-weight="600" font-size="22" letter-spacing="3">SEED ROUND 2026 • OFFICIAL MEMORANDUM</text>
+
+  <!-- Subtitle -->
+  <text x="100" y="380" fill="#94a3b8" font-family="'Plus Jakarta Sans', sans-serif" font-size="28" font-weight="400">
+    Экосистема нового поколения для авторов прямых трансляций
+  </text>
+  <text x="100" y="420" fill="#64748b" font-family="'Plus Jakarta Sans', sans-serif" font-size="22" font-weight="400">
+    Agency • Desktop • Mobile • NovaLink • Academy • LIVE • Tools
+  </text>
+
+  <!-- Bottom Metric Badges -->
+  <g transform="translate(100, 480)">
+    <rect width="220" height="70" rx="16" fill="#ffffff" fill-opacity="0.03" stroke="#ffffff" stroke-opacity="0.1"/>
+    <text x="20" y="28" fill="#64748b" font-family="monospace" font-size="12">TARGET RAISE</text>
+    <text x="20" y="54" fill="#22d3ee" font-family="sans-serif" font-weight="bold" font-size="22">$10,000 USD</text>
+  </g>
+
+  <g transform="translate(340, 480)">
+    <rect width="220" height="70" rx="16" fill="#ffffff" fill-opacity="0.03" stroke="#ffffff" stroke-opacity="0.1"/>
+    <text x="20" y="28" fill="#64748b" font-family="monospace" font-size="12">MAX EQUITY</text>
+    <text x="20" y="54" fill="#818cf8" font-family="sans-serif" font-weight="bold" font-size="22">Up to 10%</text>
+  </g>
+
+  <g transform="translate(580, 480)">
+    <rect width="220" height="70" rx="16" fill="#ffffff" fill-opacity="0.03" stroke="#ffffff" stroke-opacity="0.1"/>
+    <text x="20" y="28" fill="#64748b" font-family="monospace" font-size="12">VALUATION</text>
+    <text x="20" y="54" fill="#10b981" font-family="sans-serif" font-weight="bold" font-size="22">$100,000 USD</text>
+  </g>
+</svg>

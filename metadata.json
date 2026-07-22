@@ -1,0 +1,6 @@
+{
+  "name": "NovaBoost Seed Round 2026",
+  "description": "Official investor presentation landing page for NovaBoost Seed Round 2026.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
