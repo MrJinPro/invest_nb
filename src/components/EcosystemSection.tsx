@@ -15,6 +15,8 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { ECOSYSTEM_PRODUCTS, ECOSYSTEM_FLOW, ProductItem } from '../data/novaboost-data';
+import { useLanguage } from '../context/LanguageContext';
+import { TRANSLATIONS } from '../data/translations';
 
 const getProductIcon = (type: string) => {
   switch (type) {
@@ -30,6 +32,9 @@ const getProductIcon = (type: string) => {
 };
 
 export const EcosystemSection: React.FC = () => {
+  const { language } = useLanguage();
+  const t = TRANSLATIONS[language];
+
   const [selectedProduct, setSelectedProduct] = useState<ProductItem | null>(ECOSYSTEM_PRODUCTS[0]);
   const [activeFlowStep, setActiveFlowStep] = useState<number>(0);
 
@@ -45,19 +50,18 @@ export const EcosystemSection: React.FC = () => {
         <div className="text-center max-w-3xl mx-auto space-y-4">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-semibold tracking-wide">
             <Layers className="w-3.5 h-3.5" />
-            <span>Единая Инфраструктура</span>
+            <span>{t.ecosystem.badge}</span>
           </div>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight font-['Outfit']">
-            Единая Экосистема <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-400">NovaBoost</span>
+            {t.ecosystem.title}
           </h2>
           <p className="text-slate-400 text-base sm:text-lg leading-relaxed">
-            7 ключевых модулей, образующих полный цикл производства, стриминга, монетизации и роста аудитории. Все сервисы тесно взаимосвязаны.
+            {t.ecosystem.subtitle}
           </p>
         </div>
 
-        {/* Product Cards Grid with visual connecting mesh */}
+        {/* Product Cards Grid */}
         <div className="relative">
-          {/* Subtle connecting lines vector background */}
           <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-20 hidden lg:block" preserveAspectRatio="none">
             <path d="M 150 100 Q 400 50 650 100 T 1150 100" fill="none" stroke="url(#lineGradient)" strokeWidth="1.5" strokeDasharray="4 4" />
             <path d="M 200 350 Q 550 400 900 350" fill="none" stroke="url(#lineGradient)" strokeWidth="1.5" strokeDasharray="4 4" />
@@ -165,19 +169,19 @@ export const EcosystemSection: React.FC = () => {
           </motion.div>
         )}
 
-        {/* Interactive Scheme: "Как работает экосистема" */}
+        {/* Interactive Scheme */}
         <div className="p-6 sm:p-10 rounded-3xl glass-panel border border-white/10 space-y-8">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <span className="text-xs font-mono text-cyan-400 font-semibold uppercase tracking-wider">
-                Синергетическая Модель
+                {language === 'ru' ? 'Синергетическая Модель' : 'Synergistic Model'}
               </span>
               <h3 className="text-2xl font-bold text-white font-['Outfit']">
-                Как работает экосистема
+                {t.ecosystem.howItWorksTitle}
               </h3>
             </div>
             <p className="text-xs text-slate-400 max-w-md">
-              Последовательное сопровождение стримера от первого B2B контракта до масштабирования вовлечения и роста LTV.
+              {t.ecosystem.howItWorksSubtitle}
             </p>
           </div>
 
@@ -234,7 +238,7 @@ export const EcosystemSection: React.FC = () => {
                 </div>
               </div>
               <span className="text-[11px] font-mono text-cyan-400 shrink-0 hidden sm:inline-block">
-                Кликните на этап для деталей
+                {language === 'ru' ? 'Кликните на этап для деталей' : 'Click step for details'}
               </span>
             </div>
           </div>

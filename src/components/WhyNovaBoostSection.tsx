@@ -11,6 +11,8 @@ import {
   Zap
 } from 'lucide-react';
 import { WHY_NOVABOOST } from '../data/novaboost-data';
+import { useLanguage } from '../context/LanguageContext';
+import { TRANSLATIONS } from '../data/translations';
 
 const getAdvantageIcon = (iconName: string) => {
   switch (iconName) {
@@ -25,6 +27,9 @@ const getAdvantageIcon = (iconName: string) => {
 };
 
 export const WhyNovaBoostSection: React.FC = () => {
+  const { language } = useLanguage();
+  const t = TRANSLATIONS[language];
+
   return (
     <section className="py-24 relative overflow-hidden bg-[#080b11]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-16">
@@ -33,13 +38,13 @@ export const WhyNovaBoostSection: React.FC = () => {
         <div className="text-center max-w-3xl mx-auto space-y-4">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold tracking-wide">
             <Zap className="w-3.5 h-3.5" />
-            <span>Фундаментальные Плюсы</span>
+            <span>{t.why.badge}</span>
           </div>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight font-['Outfit']">
-            Почему <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-400">NovaBoost</span>?
+            {t.why.title}
           </h2>
           <p className="text-slate-400 text-base sm:text-lg leading-relaxed">
-            Архитектурные и коммерческие драйверы, создающие долгосрочный ров (Moat) и устойчивое преимущество перед точечными утилитами.
+            {t.why.subtitle}
           </p>
         </div>
 
@@ -76,7 +81,7 @@ export const WhyNovaBoostSection: React.FC = () => {
 
               <div className="pt-3 border-t border-white/5 flex items-center gap-1.5 text-[11px] font-mono text-cyan-400">
                 <CheckCircle2 className="w-3.5 h-3.5" />
-                <span>Проверенное системное преимущество</span>
+                <span>{language === 'ru' ? 'Проверенное системное преимущество' : 'Verified Competitive Moat'}</span>
               </div>
             </motion.div>
           ))}

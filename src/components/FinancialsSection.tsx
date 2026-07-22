@@ -3,11 +3,16 @@ import { motion } from 'motion/react';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Doughnut } from 'react-chartjs-2';
 import { PieChart, DollarSign, ShieldAlert, CheckCircle2 } from 'lucide-react';
-import { REVENUE_STRUCTURE, USE_OF_FUNDS } from '../data/novaboost-data';
+import { REVENUE_STRUCTURE, USE_OF_FUNDS, SEED_ROUND_TERMS } from '../data/novaboost-data';
+import { useLanguage } from '../context/LanguageContext';
+import { TRANSLATIONS } from '../data/translations';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 export const FinancialsSection: React.FC = () => {
+  const { language } = useLanguage();
+  const t = TRANSLATIONS[language];
+
   // Donut chart config for Revenue Structure
   const revenueChartData = {
     labels: REVENUE_STRUCTURE.categories.map(c => c.label),
@@ -58,20 +63,20 @@ export const FinancialsSection: React.FC = () => {
   };
 
   return (
-    <section className="py-24 relative overflow-hidden bg-[#080b11]">
+    <section id="investment" className="py-24 relative overflow-hidden bg-[#080b11]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-16">
         
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto space-y-4">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-semibold tracking-wide">
             <PieChart className="w-3.5 h-3.5" />
-            <span>Финансовая Структура & Использование Средств</span>
+            <span>{t.financials.badge}</span>
           </div>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight font-['Outfit']">
-            Финансовая Модель и <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-400">Инвестиции</span>
+            {t.financials.title}
           </h2>
           <p className="text-slate-400 text-base sm:text-lg leading-relaxed">
-            Прозрачное разделение структуры потоков доходов и строго целевое использование привлеченных инвестиций Seed-раунда.
+            {t.financials.subtitle}
           </p>
         </div>
 
@@ -86,13 +91,15 @@ export const FinancialsSection: React.FC = () => {
           >
             <div className="space-y-1">
               <span className="text-xs font-mono text-cyan-400 font-semibold uppercase tracking-wider">
-                Типы выручки
+                {language === 'ru' ? 'Типы выручки' : 'Revenue Types'}
               </span>
               <h3 className="text-2xl font-bold text-white font-['Outfit']">
-                Структура Доходов (Revenue Structure)
+                {language === 'ru' ? 'Структура Доходов (Revenue Structure)' : 'Revenue Structure'}
               </h3>
               <p className="text-xs text-slate-400">
-                Баланс между прогнозируемой регулярной SaaS-выручкой и масштабируемым транзакционным оборотом.
+                {language === 'ru' 
+                  ? 'Баланс между прогнозируемой регулярной SaaS-выручкой и масштабируемым транзакционным оборотом.'
+                  : 'Balance between predictable recurring SaaS revenue and scalable transactional velocity.'}
               </p>
             </div>
 
@@ -101,7 +108,7 @@ export const FinancialsSection: React.FC = () => {
               <div className="w-48 h-48 relative shrink-0">
                 <Doughnut data={revenueChartData} options={revenueChartOptions} />
                 <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                  <span className="text-xs text-slate-400 font-mono">Баланс</span>
+                  <span className="text-xs text-slate-400 font-mono">{language === 'ru' ? 'Баланс' : 'Balance'}</span>
                   <span className="text-lg font-bold text-white font-['Outfit']">Revenue</span>
                 </div>
               </div>
@@ -119,7 +126,7 @@ export const FinancialsSection: React.FC = () => {
             </div>
 
             <div className="p-3 rounded-xl bg-cyan-500/5 border border-cyan-500/15 text-xs text-slate-300">
-              <span className="font-semibold text-cyan-300">Отказ от фиктивных прогнозов:</span> Настоящий блок отображает фундаментальную бизнес-модель без вымышленных финансовых графиков экстраполяции.
+              <span className="font-semibold text-cyan-300">{language === 'ru' ? 'Прозрачные метрики:' : 'Transparent Metrics:'}</span> {language === 'ru' ? 'Блок отображает фундаментальную бизнес-модель без вымышленных финансовых графиков.' : 'Displays fundamental business model without fictional metrics.'}
             </div>
           </motion.div>
 
@@ -132,13 +139,13 @@ export const FinancialsSection: React.FC = () => {
           >
             <div className="space-y-1">
               <span className="text-xs font-mono text-indigo-400 font-semibold uppercase tracking-wider">
-                Целевое назначение
+                {language === 'ru' ? 'Целевое назначение' : 'Use of Capital'}
               </span>
               <h3 className="text-2xl font-bold text-white font-['Outfit']">
-                Использование Инвестиций ($10,000 USD)
+                {language === 'ru' ? `Использование Инвестиций ($${SEED_ROUND_TERMS.targetAmountUSD.toLocaleString()} USD)` : `Use of Funds ($${SEED_ROUND_TERMS.targetAmountUSD.toLocaleString()} USD)`}
               </h3>
               <p className="text-xs text-slate-400">
-                Распределение ресурсов Seed-раунда на ключевые производственные направления.
+                {language === 'ru' ? 'Распределение ресурсов Seed-раунда на ключевые производственные направления.' : 'Allocation of Seed round funds across key operational directions.'}
               </p>
             </div>
 
@@ -147,8 +154,8 @@ export const FinancialsSection: React.FC = () => {
               <div className="w-48 h-48 relative shrink-0">
                 <Doughnut data={allocationChartData} options={revenueChartOptions} />
                 <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                  <span className="text-xs text-slate-400 font-mono">Раунд</span>
-                  <span className="text-lg font-bold text-cyan-400 font-['Outfit']">$10,000</span>
+                  <span className="text-xs text-slate-400 font-mono">{language === 'ru' ? 'Раунд' : 'Round'}</span>
+                  <span className="text-lg font-bold text-cyan-400 font-['Outfit']">${SEED_ROUND_TERMS.targetAmountUSD.toLocaleString()}</span>
                 </div>
               </div>
 
@@ -167,7 +174,7 @@ export const FinancialsSection: React.FC = () => {
 
             <div className="p-3 rounded-xl bg-indigo-500/5 border border-indigo-500/15 text-xs text-slate-300 flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-indigo-400 shrink-0" />
-              <span>Финансовые потоки контролируются и фиксируются инвестиционным договором.</span>
+              <span>{language === 'ru' ? 'Финансовые потоки контролируются и фиксируются инвестиционным договором.' : 'Financial flows are controlled and legally structured by contract.'}</span>
             </div>
           </motion.div>
 

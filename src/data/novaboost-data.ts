@@ -70,8 +70,8 @@ export interface FaqItem {
 // Exact official Seed Round terms
 export const SEED_ROUND_TERMS = {
   roundName: "Seed Round 2026",
-  targetAmountUSD: 10000,
-  maxEquityPercent: 10.0,
+  targetAmountUSD: 25000,
+  maxEquityPercent: 25.0,
   minInvestmentUSD: 3000,
   impliedValuationUSD: 100000,
   currency: "USD",

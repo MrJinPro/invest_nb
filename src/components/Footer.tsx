@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
 import { ShieldCheck, Lock, Sparkles, FileText, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { useLanguage } from '../context/LanguageContext';
+import { TRANSLATIONS } from '../data/translations';
 
 export const Footer: React.FC = () => {
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
+  const { language } = useLanguage();
+  const t = TRANSLATIONS[language];
 
   return (
     <footer className="bg-[#05080e] border-t border-white/10 py-12 relative overflow-hidden text-xs text-slate-400">
@@ -22,7 +26,9 @@ export const Footer: React.FC = () => {
               </span>
             </div>
             <p className="text-xs text-slate-400">
-              Next Generation Streaming Ecosystem. All metrics strictly based on Memorandum facts.
+              {language === 'ru' 
+                ? 'Стриминговая Экосистема Нового Поколения. Все метрики строго соответствуют меморандуму.' 
+                : 'Next Generation Streaming Ecosystem. All metrics strictly based on Memorandum facts.'}
             </p>
           </div>
 
@@ -32,14 +38,14 @@ export const Footer: React.FC = () => {
               onClick={() => setShowPrivacyModal(true)}
               className="text-slate-400 hover:text-cyan-400 transition-colors cursor-pointer"
             >
-              Privacy Policy
+              {language === 'ru' ? 'Политика Конфиденциальности' : 'Privacy Policy'}
             </button>
 
             <span className="text-slate-700">•</span>
 
             <span className="text-slate-400 flex items-center gap-1">
               <Lock className="w-3.5 h-3.5 text-cyan-400" />
-              <span>Confidential</span>
+              <span>{language === 'ru' ? 'Конфиденциально' : 'Confidential'}</span>
             </span>
           </div>
 
@@ -72,7 +78,7 @@ export const Footer: React.FC = () => {
               <div className="flex items-center justify-between border-b border-white/10 pb-4">
                 <div className="flex items-center gap-2 text-white font-bold text-lg font-['Outfit']">
                   <FileText className="w-5 h-5 text-cyan-400" />
-                  <span>Политика Конфиденциальности</span>
+                  <span>{language === 'ru' ? 'Политика Конфиденциальности' : 'Privacy Policy'}</span>
                 </div>
                 <button
                   onClick={() => setShowPrivacyModal(false)}
@@ -83,15 +89,31 @@ export const Footer: React.FC = () => {
               </div>
 
               <div className="space-y-4 text-xs leading-relaxed">
-                <p>
-                  1. Все данные, переданные через формы обратной связи данного сайта, используются исключительно для целей коммуникации по раунду NovaBoost Seed Round 2026.
-                </p>
-                <p>
-                  2. Проект NovaBoost обязуется не передавать третьим лицам контактную информацию инвесторов без их явного письменного согласия.
-                </p>
-                <p>
-                  3. Инвестиционные материалы и меморандум предназначены строго для персонального ознакомления квалифицированными и частными инвесторами.
-                </p>
+                {language === 'ru' ? (
+                  <>
+                    <p>
+                      1. Все данные, переданные через формы обратной связи данного сайта, используются исключительно для целей коммуникации по раунду NovaBoost Seed Round 2026.
+                    </p>
+                    <p>
+                      2. Проект NovaBoost обязуется не передавать третьим лицам контактную информацию инвесторов без их явного письменного согласия.
+                    </p>
+                    <p>
+                      3. Инвестиционные материалы и меморандум предназначены строго для персонального ознакомления квалифицированными и частными инвесторами.
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p>
+                      1. All information submitted through contact forms on this platform is processed solely for communication regarding NovaBoost Seed Round 2026.
+                    </p>
+                    <p>
+                      2. NovaBoost guarantees confidential handling and will not share investor contact details with third parties without express consent.
+                    </p>
+                    <p>
+                      3. Investment materials and memorandum documents are intended strictly for individual review by prospective investors.
+                    </p>
+                  </>
+                )}
               </div>
 
               <div className="pt-4 border-t border-white/10 flex justify-end">
@@ -99,7 +121,7 @@ export const Footer: React.FC = () => {
                   onClick={() => setShowPrivacyModal(false)}
                   className="px-5 py-2.5 rounded-xl bg-cyan-500 text-white font-bold text-xs cursor-pointer"
                 >
-                  Понятно
+                  {language === 'ru' ? 'Понятно' : 'Close'}
                 </button>
               </div>
             </motion.div>

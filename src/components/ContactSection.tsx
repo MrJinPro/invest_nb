@@ -16,10 +16,15 @@ import {
   Check,
   Video,
   ExternalLink,
-  Inbox
+  Inbox,
+  Lock,
+  Unlock
 } from 'lucide-react';
 import { FOUNDER_INFO } from '../data/novaboost-data';
 import { addLead, generateTelegramLink, generateMailtoLink, Lead } from '../data/leadsStore';
+import { useSecretUnlock } from '../hooks/useSecretUnlock';
+import { useLanguage } from '../context/LanguageContext';
+import { TRANSLATIONS } from '../data/translations';
 
 interface ContactSectionProps {
   onOpenSchedule: () => void;
@@ -32,6 +37,9 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
   onOpenLeadsModal,
   initialInvestmentAmount 
 }) => {
+  const { language } = useLanguage();
+  const t = TRANSLATIONS[language];
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -47,6 +55,16 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
   const [errorMessage, setErrorMessage] = useState('');
   const [lastCreatedLead, setLastCreatedLead] = useState<Lead | null>(null);
   const [copiedSummary, setCopiedSummary] = useState(false);
+
+  const secretUnlock = useSecretUnlock({
+    requiredTaps: 10,
+    resetDelayMs: 1200,
+    onUnlock: () => {
+      if (onOpenLeadsModal) {
+        onOpenLeadsModal();
+      }
+    }
+  });
 
   // Simple math CAPTCHA challenge
   const [captchaNum1] = useState(4);
@@ -65,15 +83,15 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
 
     // Form Validations
     if (!formData.name.trim()) {
-      setErrorMessage('Пожалуйста, укажите ваше имя.');
+      setErrorMessage(language === 'ru' ? 'Пожалуйста, укажите ваше имя.' : 'Please enter your name.');
       return;
     }
     if (!formData.email.trim() || !formData.email.includes('@')) {
-      setErrorMessage('Пожалуйста, укажите корректный email адрес.');
+      setErrorMessage(language === 'ru' ? 'Пожалуйста, укажите корректный email адрес.' : 'Please enter a valid email address.');
       return;
     }
     if (parseInt(formData.userCaptchaAnswer) !== expectedCaptchaSum) {
-      setErrorMessage(`Ошибка капчи: Сколько будет ${captchaNum1} + ${captchaNum2}?`);
+      setErrorMessage(language === 'ru' ? `Ошибка капчи: Сколько будет ${captchaNum1} + ${captchaNum2}?` : `Security check error: What is ${captchaNum1} + ${captchaNum2}?`);
       return;
     }
 
@@ -106,12 +124,12 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
 
   const copyLeadSummaryText = () => {
     if (!lastCreatedLead) return;
-    const text = `Инвестиционная заявка NovaBoost Seed Round 2026:
-Имя: ${formData.name}
+    const text = `Investment Lead NovaBoost Seed Round 2026:
+Name: ${formData.name}
 Email: ${formData.email}
-Сумма билета: $${formData.investmentAmount.toLocaleString()} USD
-Компания: ${formData.company || '—'}
-Сообщение: ${formData.message || '—'}`;
+Amount: $${formData.investmentAmount.toLocaleString()} USD
+Company: ${formData.company || '—'}
+Message: ${formData.message || '—'}`;
     navigator.clipboard.writeText(text);
     setCopiedSummary(true);
     setTimeout(() => setCopiedSummary(false), 2000);
@@ -128,13 +146,13 @@ Email: ${formData.email}
         <div className="text-center max-w-3xl mx-auto space-y-4">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-semibold tracking-wide">
             <Mail className="w-3.5 h-3.5" />
-            <span>Связь с Проектом</span>
+            <span>{t.contact.badge}</span>
           </div>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight font-['Outfit']">
-            Контакты и <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-400">Форма Заявки</span>
+            {t.contact.title}
           </h2>
           <p className="text-slate-400 text-base sm:text-lg leading-relaxed">
-            Свяжитесь с основателем NovaBoost напрямую или назначьте персональную онлайн-встречу.
+            {t.contact.subtitle}
           </p>
         </div>
 
@@ -184,7 +202,7 @@ Email: ${formData.email}
                       <Mail className="w-4 h-4" />
                     </div>
                     <div>
-                      <div className="text-[10px] font-mono text-slate-400">Email:</div>
+                      <div className="text-[10px] font-mono text-slate-400">{t.contact.emailLabel}:</div>
                       <div className="text-xs font-bold text-white">{FOUNDER_INFO.email}</div>
                     </div>
                   </div>
@@ -192,7 +210,7 @@ Email: ${formData.email}
                   <button
                     onClick={() => handleCopy(FOUNDER_INFO.email, 'email')}
                     className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white transition-colors cursor-pointer"
-                    title="Копировать Email"
+                    title="Copy Email"
                   >
                     {copiedField === 'email' ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
                   </button>
@@ -205,7 +223,7 @@ Email: ${formData.email}
                       <MessageSquare className="w-4 h-4" />
                     </div>
                     <div>
-                      <div className="text-[10px] font-mono text-slate-400">Telegram:</div>
+                      <div className="text-[10px] font-mono text-slate-400">{t.contact.telegramLabel}:</div>
                       <div className="text-xs font-bold text-white">{FOUNDER_INFO.telegram}</div>
                     </div>
                   </div>
@@ -216,7 +234,7 @@ Email: ${formData.email}
                     rel="noopener noreferrer"
                     className="px-3 py-1.5 rounded-lg bg-sky-500/10 hover:bg-sky-500/20 text-sky-300 border border-sky-500/20 text-xs font-semibold transition-colors"
                   >
-                    Написать
+                    {language === 'ru' ? 'Написать' : 'Message'}
                   </a>
                 </div>
 
@@ -238,7 +256,7 @@ Email: ${formData.email}
                     rel="noopener noreferrer"
                     className="px-3 py-1.5 rounded-lg bg-pink-500/10 hover:bg-pink-500/20 text-pink-300 border border-pink-500/20 text-xs font-semibold transition-colors"
                   >
-                    Перейти
+                    {language === 'ru' ? 'Перейти' : 'Visit'}
                   </a>
                 </div>
 
@@ -250,7 +268,7 @@ Email: ${formData.email}
                 className="w-full py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white font-bold text-xs shadow-lg shadow-cyan-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
               >
                 <Calendar className="w-4 h-4" />
-                <span>Запланировать Онлайн-Встречу с Основателем</span>
+                <span>{t.contact.pitchCallLabel}</span>
               </button>
 
             </div>
@@ -263,13 +281,13 @@ Email: ${formData.email}
               
               <div className="space-y-1">
                 <span className="text-xs font-mono font-bold text-cyan-400 uppercase tracking-wider">
-                  Инвестиционная Заявка
+                  {t.contact.badge}
                 </span>
                 <h3 className="text-2xl font-bold text-white font-['Outfit']">
-                  Запрос Инвестиционного Пакета
+                  {t.contact.title}
                 </h3>
                 <p className="text-xs text-slate-400">
-                  Оставьте контакты для получения полной документации и обсуждения параметров участия.
+                  {t.contact.subtitle}
                 </p>
               </div>
 
@@ -284,9 +302,9 @@ Email: ${formData.email}
                   </div>
                   
                   <div className="space-y-1.5">
-                    <h4 className="text-xl font-bold text-white font-['Outfit']">Заявка Зарегистрирована в Реестре!</h4>
+                    <h4 className="text-xl font-bold text-white font-['Outfit']">{t.contact.successTitle}</h4>
                     <p className="text-xs text-slate-300 max-w-md mx-auto leading-relaxed">
-                      Ваша заявка на <strong className="text-cyan-300">${formData.investmentAmount.toLocaleString()} USD</strong> зафиксирована в базе. Чтобы гарантированно уведомить Основателя, отправьте сообщение прямо сейчас:
+                      {t.contact.successDesc}
                     </p>
                   </div>
 
@@ -299,7 +317,7 @@ Email: ${formData.email}
                         className="w-full py-3.5 px-4 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs shadow-lg shadow-cyan-500/25 flex items-center justify-center gap-2 transition-all cursor-pointer"
                       >
                         <Send className="w-4 h-4" />
-                        <span>💬 Отправить в Telegram Основателю (@MrJinPro)</span>
+                        <span>{t.contact.sendTgBtn}</span>
                         <ExternalLink className="w-3.5 h-3.5 opacity-70" />
                       </a>
 
@@ -308,7 +326,7 @@ Email: ${formData.email}
                         className="w-full py-3 px-4 rounded-xl bg-white/10 hover:bg-white/15 text-white font-semibold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer border border-white/10"
                       >
                         <Mail className="w-4 h-4 text-indigo-400" />
-                        <span>✉️ Отправить письмо на admin@novaboost.cloud</span>
+                        <span>{t.contact.sendEmailBtn}</span>
                       </a>
 
                       <div className="flex items-center gap-2 pt-1">
@@ -317,16 +335,17 @@ Email: ${formData.email}
                           className="flex-1 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 text-xs font-medium flex items-center justify-center gap-1.5 cursor-pointer"
                         >
                           {copiedSummary ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                          <span>{copiedSummary ? 'Скопировано!' : 'Скопировать текст'}</span>
+                          <span>{copiedSummary ? t.contact.copiedBtn : t.contact.copyTextBtn}</span>
                         </button>
 
                         {onOpenLeadsModal && (
                           <button
-                            onClick={onOpenLeadsModal}
-                            className="py-2 px-3 rounded-xl bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/30 text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
+                            onClick={secretUnlock.handleTap}
+                            className="py-2 px-3 rounded-xl text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-all border bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border-cyan-500/30"
+                            title={t.contact.registryBtn}
                           >
                             <Inbox className="w-3.5 h-3.5" />
-                            <span>Реестр Заявок</span>
+                            <span>{t.contact.registryBtn}</span>
                           </button>
                         )}
                       </div>
@@ -335,10 +354,13 @@ Email: ${formData.email}
 
                   <div className="pt-2">
                     <button
-                      onClick={() => setStatus('idle')}
-                      className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 text-xs font-medium cursor-pointer"
+                      onClick={() => {
+                        setStatus('idle');
+                        setFormData(prev => ({ ...prev, userCaptchaAnswer: '' }));
+                      }}
+                      className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 text-xs font-medium transition-colors cursor-pointer"
                     >
-                      Подать еще одну заявку
+                      {t.contact.anotherBtn}
                     </button>
                   </div>
                 </motion.div>
@@ -354,95 +376,90 @@ Email: ${formData.email}
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {/* Name */}
-                    <div className="space-y-1">
-                      <label className="text-xs font-medium text-slate-300">
-                        Ваше Имя <span className="text-rose-400">*</span>
-                      </label>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-medium text-slate-300">{t.contact.yourName} *</label>
                       <input
                         type="text"
                         required
-                        placeholder="Александр"
+                        placeholder="Никита / Founder Fund"
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        className="w-full px-4 py-3 rounded-xl bg-white/[0.04] border border-white/10 text-white text-xs focus:outline-none focus:border-cyan-400 transition-all"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-white/[0.03] border border-white/10 focus:border-cyan-400 text-white text-xs focus:outline-none focus:ring-1 focus:ring-cyan-400 transition-all"
                       />
                     </div>
 
                     {/* Email */}
-                    <div className="space-y-1">
-                      <label className="text-xs font-medium text-slate-300">
-                        Email <span className="text-rose-400">*</span>
-                      </label>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-medium text-slate-300">{t.contact.yourEmail} *</label>
                       <input
                         type="email"
                         required
-                        placeholder="investor@domain.com"
+                        placeholder="investor@fund.com"
                         value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        className="w-full px-4 py-3 rounded-xl bg-white/[0.04] border border-white/10 text-white text-xs focus:outline-none focus:border-cyan-400 transition-all"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-white/[0.03] border border-white/10 focus:border-cyan-400 text-white text-xs focus:outline-none focus:ring-1 focus:ring-cyan-400 transition-all"
                       />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {/* Company */}
-                    <div className="space-y-1">
-                      <label className="text-xs font-medium text-slate-300">
-                        Компания / Фонд (опционально)
-                      </label>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-medium text-slate-300">{t.contact.companyName}</label>
                       <input
                         type="text"
-                        placeholder="Ventures Capital"
+                        placeholder="Nova Capital"
                         value={formData.company}
                         onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                        className="w-full px-4 py-3 rounded-xl bg-white/[0.04] border border-white/10 text-white text-xs focus:outline-none focus:border-cyan-400 transition-all"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-white/[0.03] border border-white/10 focus:border-cyan-400 text-white text-xs focus:outline-none focus:ring-1 focus:ring-cyan-400 transition-all"
                       />
                     </div>
 
-                    {/* Investment Amount */}
-                    <div className="space-y-1">
-                      <label className="text-xs font-medium text-slate-300">
-                        Планируемая сумма (USD)
-                      </label>
+                    {/* Investment Amount Select / Input */}
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-medium text-slate-300">{t.contact.investmentSum}</label>
                       <select
                         value={formData.investmentAmount}
                         onChange={(e) => setFormData({ ...formData, investmentAmount: Number(e.target.value) })}
-                        className="w-full px-4 py-3 rounded-xl bg-[#0d1527] border border-white/10 text-white text-xs focus:outline-none focus:border-cyan-400 transition-all"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-[#090d18] border border-white/10 focus:border-cyan-400 text-white text-xs focus:outline-none focus:ring-1 focus:ring-cyan-400 transition-all cursor-pointer"
                       >
-                        <option value={3000}>$3,000 USD (Min Ticket)</option>
-                        <option value={5000}>$5,000 USD (5% equity)</option>
-                        <option value={7000}>$7,000 USD (7% equity)</option>
-                        <option value={10000}>$10,000 USD (Max 10% equity)</option>
+                        <option value={3000}>$3,000 USD (3.0% equity share)</option>
+                        <option value={5000}>$5,000 USD (5.0% equity share)</option>
+                        <option value={10000}>$10,000 USD (10.0% equity share)</option>
+                        <option value={15000}>$15,000 USD (15.0% equity share)</option>
+                        <option value={25000}>$25,000 USD (25.0% max equity share)</option>
                       </select>
                     </div>
                   </div>
 
                   {/* Message */}
-                  <div className="space-y-1">
-                    <label className="text-xs font-medium text-slate-300">
-                      Сообщение / Вопросы (опционально)
-                    </label>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-medium text-slate-300">{t.contact.messageLabel}</label>
                     <textarea
                       rows={3}
-                      placeholder="Интересуют детали юрисдикции и графики следующих релизов..."
+                      placeholder={language === 'ru' ? 'Задать вопрос по терминам раунда или условиям SAFE/Note...' : 'Ask about round terms or SAFE/Note conditions...'}
                       value={formData.message}
                       onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl bg-white/[0.04] border border-white/10 text-white text-xs focus:outline-none focus:border-cyan-400 transition-all"
-                    ></textarea>
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-white/[0.03] border border-white/10 focus:border-cyan-400 text-white text-xs focus:outline-none focus:ring-1 focus:ring-cyan-400 transition-all"
+                    />
                   </div>
 
-                  {/* Anti-spam CAPTCHA */}
-                  <div className="p-3 rounded-xl bg-white/[0.02] border border-white/5 flex items-center justify-between gap-4">
-                    <span className="text-xs font-mono text-slate-300">
-                      Защита от спама: Сколько будет {captchaNum1} + {captchaNum2}?
-                    </span>
+                  {/* Security Math Challenge (CAPTCHA) */}
+                  <div className="p-3.5 rounded-2xl bg-white/[0.02] border border-white/10 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-medium text-slate-300 flex items-center gap-1.5">
+                        <ShieldCheck className="w-4 h-4 text-cyan-400" />
+                        <span>{t.contact.captchaLabel} <strong className="text-cyan-300 font-mono text-sm">{captchaNum1} + {captchaNum2}</strong>?</span>
+                      </span>
+                      <span className="text-[10px] font-mono text-slate-400">Security Check</span>
+                    </div>
                     <input
                       type="number"
                       required
-                      placeholder="?"
+                      placeholder="Ответ (число)"
                       value={formData.userCaptchaAnswer}
                       onChange={(e) => setFormData({ ...formData, userCaptchaAnswer: e.target.value })}
-                      className="w-16 px-3 py-1.5 rounded-lg bg-white/10 border border-white/20 text-white text-xs text-center font-bold focus:outline-none focus:border-cyan-400"
+                      className="w-full px-3.5 py-2 rounded-xl bg-white/[0.03] border border-white/10 focus:border-cyan-400 text-white text-xs font-mono focus:outline-none"
                     />
                   </div>
 
@@ -450,14 +467,15 @@ Email: ${formData.email}
                   <button
                     type="submit"
                     disabled={status === 'submitting'}
-                    className="w-full py-4 rounded-xl bg-gradient-to-r from-cyan-500 via-sky-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white font-bold text-xs uppercase tracking-wider shadow-xl shadow-cyan-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                    className="w-full py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white font-bold text-xs shadow-lg shadow-cyan-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
                   >
                     <Send className="w-4 h-4" />
-                    <span>{status === 'submitting' ? 'Отправка...' : 'Запросить Информацию'}</span>
+                    <span>{status === 'submitting' ? t.contact.submitting : t.contact.submitBtn}</span>
                   </button>
 
-                  <p className="text-[11px] text-slate-400 text-center leading-normal">
-                    Все поступающие заявки доставляются Основателю проекта напрямую на <strong className="text-cyan-400">admin@novaboost.cloud</strong> и в Telegram <strong className="text-cyan-400">@MrJinPro</strong>.
+                  <p className="text-[11px] text-slate-400 text-center flex items-center justify-center gap-1.5">
+                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>{language === 'ru' ? 'Конфиденциально. Данные передаются напрямую основателю NovaBoost.' : 'Confidential. Sent directly to Founder.'}</span>
                   </p>
 
                 </form>

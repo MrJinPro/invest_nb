@@ -15,6 +15,8 @@ import {
   ChevronDown
 } from 'lucide-react';
 import { SEED_ROUND_TERMS } from '../data/novaboost-data';
+import { useLanguage } from '../context/LanguageContext';
+import { TRANSLATIONS } from '../data/translations';
 
 interface HeroSectionProps {
   onOpenMemorandum: () => void;
@@ -22,6 +24,8 @@ interface HeroSectionProps {
 }
 
 export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenMemorandum, onOpenSchedule }) => {
+  const { language } = useLanguage();
+  const t = TRANSLATIONS[language];
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   // Canvas animated abstract dark mesh / particle effect
@@ -42,7 +46,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenMemorandum, onOp
     };
     window.addEventListener('resize', handleResize);
 
-    // Particle nodes for abstract mesh
     const particleCount = Math.min(Math.floor(width / 25), 45);
     const particles: Array<{
       x: number;
@@ -67,7 +70,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenMemorandum, onOp
     const render = () => {
       ctx.clearRect(0, 0, width, height);
 
-      // Draw subtle background radial glow
       const gradient = ctx.createRadialGradient(
         width * 0.5,
         height * 0.35,
@@ -82,7 +84,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenMemorandum, onOp
       ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, width, height);
 
-      // Connect particles with lines
       for (let i = 0; i < particles.length; i++) {
         const p1 = particles[i];
         p1.x += p1.vx;
@@ -91,7 +92,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenMemorandum, onOp
         if (p1.x < 0 || p1.x > width) p1.vx *= -1;
         if (p1.y < 0 || p1.y > height) p1.vy *= -1;
 
-        // Draw node
         ctx.beginPath();
         ctx.arc(p1.x, p1.y, p1.radius, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(56, 189, 248, ${p1.alpha})`;
@@ -157,7 +157,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenMemorandum, onOp
               className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 text-xs font-semibold tracking-wide backdrop-blur-md"
             >
               <Sparkles className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
-              <span>Официальное Инвестиционное Предложение</span>
+              <span>{t.hero.badge}</span>
               <span className="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
               <span className="font-mono text-cyan-400">2026</span>
             </motion.div>
@@ -170,13 +170,14 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenMemorandum, onOp
               className="space-y-4"
             >
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-[1.1] font-['Outfit']">
-                Построение Стриминговой{' '}
+                {t.hero.titleStart}{' '}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-300 to-indigo-400">
-                  Экосистемы Нового Поколения
-                </span>
+                  {t.hero.titleHighlight}
+                </span>{' '}
+                {t.hero.titleEnd}
               </h1>
               <p className="text-lg sm:text-xl text-slate-300 font-normal leading-relaxed max-w-2xl">
-                NovaBoost объединяет B2B агентство, десктопный и мобильный софт, ИИ-инструменты и транзакционный шлюз в единую устойчивую экосистему для стримеров, брендов и зрителей.
+                {t.hero.description}
               </p>
             </motion.div>
 
@@ -192,8 +193,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenMemorandum, onOp
                   <Layers className="w-4 h-4" />
                 </div>
                 <div>
-                  <div className="text-xs text-slate-400 font-medium">Продуктов</div>
-                  <div className="text-sm font-bold text-white">7 Модулей</div>
+                  <div className="text-xs text-slate-400 font-medium">{language === 'ru' ? 'Продуктов' : 'Products'}</div>
+                  <div className="text-sm font-bold text-white">{language === 'ru' ? '7 Модулей' : '7 Modules'}</div>
                 </div>
               </div>
 
@@ -202,8 +203,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenMemorandum, onOp
                   <TrendingUp className="w-4 h-4" />
                 </div>
                 <div>
-                  <div className="text-xs text-slate-400 font-medium">Монетизация</div>
-                  <div className="text-sm font-bold text-white">Диверсифицирована</div>
+                  <div className="text-xs text-slate-400 font-medium">{language === 'ru' ? 'Монетизация' : 'Monetization'}</div>
+                  <div className="text-sm font-bold text-white">{language === 'ru' ? 'Диверсифицирована' : 'Diversified'}</div>
                 </div>
               </div>
 
@@ -212,7 +213,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenMemorandum, onOp
                   <ShieldCheck className="w-4 h-4" />
                 </div>
                 <div>
-                  <div className="text-xs text-slate-400 font-medium">Код & IP</div>
+                  <div className="text-xs text-slate-400 font-medium">{language === 'ru' ? 'Код & IP' : 'Code & IP'}</div>
                   <div className="text-sm font-bold text-white">100% In-House</div>
                 </div>
               </div>
@@ -230,7 +231,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenMemorandum, onOp
                 className="group relative px-6 py-3.5 rounded-xl font-semibold text-sm bg-gradient-to-r from-cyan-500 via-sky-500 to-indigo-600 text-white shadow-xl shadow-cyan-500/25 hover:shadow-cyan-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer"
               >
                 <FileText className="w-4 h-4" />
-                <span>Скачать Меморандум (PDF / TXT)</span>
+                <span>{t.nav.memorandumBtn}</span>
                 <ArrowUpRight className="w-4 h-4 opacity-70 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
               </button>
 
@@ -239,14 +240,16 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenMemorandum, onOp
                 className="px-6 py-3.5 rounded-xl font-semibold text-sm bg-white/5 hover:bg-white/10 text-slate-200 border border-white/10 hover:border-cyan-500/30 active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer"
               >
                 <Send className="w-4 h-4 text-cyan-400" />
-                <span>Связаться с Основателем</span>
+                <span>{t.hero.investBtn}</span>
               </button>
             </motion.div>
 
             {/* Verification Tag */}
             <p className="text-xs text-slate-400 flex items-center gap-2 font-mono">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              Официальный Seed-раунд 2026. Без фиктивных метрик. Все данные соответствуют меморандуму.
+              {language === 'ru' 
+                ? 'Официальный Seed-раунд 2026. Без фиктивных метрик. Все данные соответствуют меморандуму.'
+                : 'Official Seed Round 2026. No fake metrics. Fully verified with memorandum terms.'}
             </p>
 
           </div>
@@ -268,7 +271,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenMemorandum, onOp
                 <div className="flex items-center justify-between pb-5 border-b border-white/10">
                   <div className="space-y-1">
                     <span className="text-xs font-mono font-semibold tracking-wider text-cyan-400 uppercase">
-                      Инвестиционный Раунд
+                      {language === 'ru' ? 'Инвестиционный Раунд' : 'Investment Round'}
                     </span>
                     <h3 className="text-xl font-bold text-white font-['Outfit']">
                       {SEED_ROUND_TERMS.roundName}
@@ -276,20 +279,20 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenMemorandum, onOp
                   </div>
                   <div className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
-                    <span>Открыт для участия</span>
+                    <span>{language === 'ru' ? 'Открыт для участия' : 'Open for Allocation'}</span>
                   </div>
                 </div>
 
-                {/* Main Terms Grid */}
+                {/* Main Terms Grid ($25,000 / 25%) */}
                 <div className="grid grid-cols-2 gap-4">
                   {/* Amount */}
                   <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5 space-y-1">
                     <div className="flex items-center gap-1.5 text-xs text-slate-400 font-medium">
                       <DollarSign className="w-3.5 h-3.5 text-cyan-400" />
-                      <span>Объем раунда</span>
+                      <span>{t.financials.targetLabel}</span>
                     </div>
                     <div className="text-2xl font-extrabold text-white font-['Outfit']">
-                      $10,000 <span className="text-xs font-normal text-slate-400">USD</span>
+                      ${SEED_ROUND_TERMS.targetAmountUSD.toLocaleString()} <span className="text-xs font-normal text-slate-400">USD</span>
                     </div>
                   </div>
 
@@ -297,10 +300,10 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenMemorandum, onOp
                   <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5 space-y-1">
                     <div className="flex items-center gap-1.5 text-xs text-slate-400 font-medium">
                       <Percent className="w-3.5 h-3.5 text-indigo-400" />
-                      <span>Максимальная доля</span>
+                      <span>{t.financials.equityLabel}</span>
                     </div>
                     <div className="text-2xl font-extrabold text-white font-['Outfit']">
-                      до 10%
+                      {language === 'ru' ? `до ${SEED_ROUND_TERMS.maxEquityPercent}%` : `up to ${SEED_ROUND_TERMS.maxEquityPercent}%`}
                     </div>
                   </div>
 
@@ -308,10 +311,10 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenMemorandum, onOp
                   <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5 space-y-1">
                     <div className="flex items-center gap-1.5 text-xs text-slate-400 font-medium">
                       <Award className="w-3.5 h-3.5 text-sky-400" />
-                      <span>Мин. инвестиция</span>
+                      <span>{t.hero.minTicketLabel}</span>
                     </div>
                     <div className="text-xl font-bold text-white font-['Outfit']">
-                      $3,000 <span className="text-xs font-normal text-slate-400">USD</span>
+                      ${SEED_ROUND_TERMS.minInvestmentUSD.toLocaleString()} <span className="text-xs font-normal text-slate-400">USD</span>
                     </div>
                   </div>
 
@@ -319,10 +322,10 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenMemorandum, onOp
                   <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5 space-y-1">
                     <div className="flex items-center gap-1.5 text-xs text-slate-400 font-medium">
                       <TrendingUp className="w-3.5 h-3.5 text-purple-400" />
-                      <span>Оценка проекта</span>
+                      <span>{t.hero.valuationLabel}</span>
                     </div>
                     <div className="text-xl font-bold text-white font-['Outfit']">
-                      $100,000 <span className="text-xs font-normal text-slate-400">USD</span>
+                      ${SEED_ROUND_TERMS.impliedValuationUSD.toLocaleString()} <span className="text-xs font-normal text-slate-400">USD</span>
                     </div>
                   </div>
                 </div>
@@ -331,10 +334,12 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenMemorandum, onOp
                 <div className="p-3.5 rounded-xl bg-cyan-500/5 border border-cyan-500/15 text-xs text-slate-300 space-y-1">
                   <div className="font-semibold text-cyan-300 flex items-center gap-1.5">
                     <Zap className="w-3.5 h-3.5 text-cyan-400" />
-                    <span>Юридическое оформление</span>
+                    <span>{language === 'ru' ? 'Юридическое оформление' : 'Legal Framework'}</span>
                   </div>
                   <p className="text-slate-400 text-[11px] leading-relaxed">
-                    Прямое инвестиционное соглашение / Convertible Note / SAFE. Фиксация доли и прав инвестора.
+                    {language === 'ru' 
+                      ? 'Прямое инвестиционное соглашение / Convertible Note / SAFE. Фиксация доли и прав инвестора.'
+                      : 'Direct Investment Agreement / Convertible Note / SAFE. Secured investor share & rights.'}
                   </p>
                 </div>
 
@@ -343,7 +348,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenMemorandum, onOp
                   onClick={() => scrollToSection('calculator')}
                   className="w-full py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-cyan-500/40 text-slate-200 hover:text-white text-xs font-semibold transition-all flex items-center justify-center gap-2 cursor-pointer group"
                 >
-                  <span>Рассчитать долю в Калькуляторе Инвестора</span>
+                  <span>{t.hero.calcBtn}</span>
                   <ChevronDown className="w-4 h-4 text-cyan-400 group-hover:translate-y-0.5 transition-transform" />
                 </button>
 

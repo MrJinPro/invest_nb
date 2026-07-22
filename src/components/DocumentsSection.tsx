@@ -12,13 +12,17 @@ import {
   Scale
 } from 'lucide-react';
 import { INVESTMENT_DOCUMENTS, DocumentItem } from '../data/novaboost-data';
+import { useLanguage } from '../context/LanguageContext';
+import { TRANSLATIONS } from '../data/translations';
 
 interface DocumentsSectionProps {
   onSelectDocument: (doc: DocumentItem) => void;
 }
 
 export const DocumentsSection: React.FC<DocumentsSectionProps> = ({ onSelectDocument }) => {
-  // Filter out non-available documents as strictly instructed
+  const { language } = useLanguage();
+  const t = TRANSLATIONS[language];
+
   const availableDocs = INVESTMENT_DOCUMENTS.filter(doc => doc.available);
 
   if (availableDocs.length === 0) return null;
@@ -37,13 +41,13 @@ export const DocumentsSection: React.FC<DocumentsSectionProps> = ({ onSelectDocu
         <div className="text-center max-w-3xl mx-auto space-y-4">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-semibold tracking-wide">
             <FileText className="w-3.5 h-3.5" />
-            <span>Документация Инвестора</span>
+            <span>{t.docs.badge}</span>
           </div>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight font-['Outfit']">
-            Инвестиционные <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-400">Документы</span>
+            {t.docs.title}
           </h2>
           <p className="text-slate-400 text-base sm:text-lg leading-relaxed">
-            Официальные материалы проекта NovaBoost. Доступны для интерактивного просмотра и скачивания.
+            {t.docs.subtitle}
           </p>
         </div>
 
@@ -86,7 +90,7 @@ export const DocumentsSection: React.FC<DocumentsSectionProps> = ({ onSelectDocu
                     className="flex-1 py-2.5 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 text-xs font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                   >
                     <Eye className="w-4 h-4 text-cyan-400" />
-                    <span>Открыть</span>
+                    <span>{language === 'ru' ? 'Открыть' : 'View'}</span>
                   </button>
 
                   <a
@@ -97,22 +101,17 @@ export const DocumentsSection: React.FC<DocumentsSectionProps> = ({ onSelectDocu
                     rel="noopener noreferrer"
                   >
                     <Download className="w-4 h-4 text-indigo-400" />
-                    <span>PDF (55 стр)</span>
+                    <span>PDF (55 {language === 'ru' ? 'стр' : 'pgs'})</span>
                   </a>
+                </div>
+
+                <div className="text-[10px] font-mono text-slate-400 text-center">
+                  {language === 'ru' ? 'Свежая версия (2026) • Проверено' : 'Latest version (2026) • Verified'}
                 </div>
               </div>
 
             </motion.div>
           ))}
-        </div>
-
-        {/* Security & Confidentiality Notice */}
-        <div className="p-4 rounded-xl bg-white/[0.02] border border-white/10 text-xs text-slate-400 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-            <span>Все документы защищены авторским правом NovaBoost 2026. Конфиденциально.</span>
-          </div>
-          <span className="font-mono text-cyan-400 text-[11px] shrink-0">Updated 2026</span>
         </div>
 
       </div>

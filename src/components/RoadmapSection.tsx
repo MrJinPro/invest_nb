@@ -9,8 +9,13 @@ import {
   ArrowRight
 } from 'lucide-react';
 import { ROADMAP_PHASES, RoadmapPhase } from '../data/novaboost-data';
+import { useLanguage } from '../context/LanguageContext';
+import { TRANSLATIONS } from '../data/translations';
 
 export const RoadmapSection: React.FC = () => {
+  const { language } = useLanguage();
+  const t = TRANSLATIONS[language];
+
   const [expandedPhase, setExpandedPhase] = useState<string>('Этап I');
 
   const togglePhase = (phase: string) => {
@@ -25,13 +30,13 @@ export const RoadmapSection: React.FC = () => {
         <div className="text-center max-w-3xl mx-auto space-y-4">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-semibold tracking-wide">
             <Compass className="w-3.5 h-3.5" />
-            <span>План Развития</span>
+            <span>{t.roadmap.badge}</span>
           </div>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight font-['Outfit']">
-            Дорожная Карта <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-indigo-400">Roadmap 2026–2027</span>
+            {t.roadmap.title}
           </h2>
           <p className="text-slate-400 text-base sm:text-lg leading-relaxed">
-            Последовательный вектор развития экосистемы от публичного запуска базовых модулей до международной экспансии.
+            {t.roadmap.subtitle}
           </p>
         </div>
 
@@ -90,7 +95,7 @@ export const RoadmapSection: React.FC = () => {
                         </span>
                         {isInProgress && (
                           <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[10px] font-semibold border border-emerald-500/20">
-                            Текущий этап
+                            {language === 'ru' ? 'Текущий этап' : 'Active Phase'}
                           </span>
                         )}
                       </div>
@@ -100,19 +105,19 @@ export const RoadmapSection: React.FC = () => {
                       </h3>
                     </div>
 
-                    <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-slate-300 shrink-0">
-                      <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${isExpanded ? 'rotate-180 text-cyan-400' : ''}`} />
+                    <div className={`p-2 rounded-xl bg-white/5 text-slate-400 transition-transform ${isExpanded ? 'rotate-180 text-cyan-400' : ''}`}>
+                      <ChevronDown className="w-5 h-5" />
                     </div>
                   </div>
 
-                  {/* Collapsible Content */}
+                  {/* Collapsible Details */}
                   <AnimatePresence>
                     {isExpanded && (
                       <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.25 }}
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3 }}
                         className="px-6 pb-6 pt-2 border-t border-white/5 space-y-4"
                       >
                         <p className="text-xs text-slate-300 leading-relaxed">
@@ -121,24 +126,22 @@ export const RoadmapSection: React.FC = () => {
 
                         <div className="space-y-2">
                           <div className="text-[11px] font-mono text-cyan-400 font-semibold uppercase tracking-wider">
-                            Ключевые майлстоуны этапа:
+                            {language === 'ru' ? 'Ключевые результаты / Milestones' : 'Key Milestones'}
                           </div>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                            {item.milestones.map((m, idx) => (
-                              <div key={idx} className="p-3 rounded-xl bg-white/[0.02] border border-white/5 text-xs text-slate-200 flex items-start gap-2.5">
-                                <CheckCircle className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
-                                <span>{m}</span>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            {item.milestones.map((ms, idx) => (
+                              <div key={idx} className="p-2.5 rounded-xl bg-white/[0.03] border border-white/5 text-xs text-slate-200 flex items-center gap-2">
+                                <CheckCircle className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                                <span>{ms}</span>
                               </div>
                             ))}
                           </div>
                         </div>
-
                       </motion.div>
                     )}
                   </AnimatePresence>
 
                 </div>
-
               </motion.div>
             );
           })}

@@ -20,7 +20,8 @@ import {
   Check, 
   Building,
   ExternalLink,
-  ShieldCheck
+  ShieldCheck,
+  Lock
 } from 'lucide-react';
 import { 
   Lead, 
@@ -44,6 +45,19 @@ export const LeadsAdminModal: React.FC<LeadsAdminModalProps> = ({ isOpen, onClos
   const [filter, setFilter] = useState<'all' | 'new' | 'meeting' | 'investment'>('all');
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
+  const [pin, setPin] = useState('');
+  const [pinError, setPinError] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  const handlePinSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (pin === '2026' || pin === '1234') {
+      setIsAuthenticated(true);
+      setPinError(false);
+    } else {
+      setPinError(true);
+    }
+  };
 
   const loadAll = () => {
     setIsRefreshing(true);
@@ -79,6 +93,67 @@ export const LeadsAdminModal: React.FC<LeadsAdminModalProps> = ({ isOpen, onClos
   }, [isOpen]);
 
   if (!isOpen) return null;
+
+  if (!isAuthenticated) {
+    return (
+      <AnimatePresence>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="glass-panel gradient-border rounded-3xl max-w-md w-full p-6 sm:p-8 border border-white/20 space-y-6 relative bg-[#090f1d] text-center"
+          >
+            <button
+              onClick={onClose}
+              className="absolute top-4 right-4 p-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 transition-colors cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 flex items-center justify-center mx-auto">
+              <Lock className="w-6 h-6" />
+            </div>
+
+            <div className="space-y-1">
+              <h3 className="text-xl font-bold text-white font-['Outfit']">
+                Панель Заявок Основателя
+              </h3>
+              <p className="text-xs text-slate-400">
+                Введите PIN-код доступа для просмотра реестра заявок
+              </p>
+            </div>
+
+            <form onSubmit={handlePinSubmit} className="space-y-4">
+              <input
+                type="password"
+                placeholder="PIN-код (по умолчанию: 2026)"
+                value={pin}
+                onChange={(e) => { setPin(e.target.value); setPinError(false); }}
+                className={`w-full text-center tracking-widest text-lg font-mono px-4 py-3 rounded-xl bg-white/5 border ${
+                  pinError ? 'border-rose-500/80 text-rose-300' : 'border-white/10 text-white'
+                } focus:outline-none focus:border-cyan-400`}
+                autoFocus
+              />
+
+              {pinError && (
+                <div className="text-xs text-rose-400 font-medium">
+                  Неверный PIN-код доступа
+                </div>
+              )}
+
+              <button
+                type="submit"
+                className="w-full py-3 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black font-bold text-xs transition-colors cursor-pointer"
+              >
+                Войти в Реестр
+              </button>
+            </form>
+          </motion.div>
+        </div>
+      </AnimatePresence>
+    );
+  }
 
   const handleStatusChange = (id: string, newStatus: Lead['status']) => {
     updateLeadStatus(id, newStatus);

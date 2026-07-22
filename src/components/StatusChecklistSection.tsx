@@ -2,8 +2,13 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { CheckCircle2, Clock, Server, Shield, Sparkles } from 'lucide-react';
 import { SYSTEM_STATUS_CHECKLIST } from '../data/novaboost-data';
+import { useLanguage } from '../context/LanguageContext';
+import { TRANSLATIONS } from '../data/translations';
 
 export const StatusChecklistSection: React.FC = () => {
+  const { language } = useLanguage();
+  const t = TRANSLATIONS[language];
+
   return (
     <section className="py-24 relative overflow-hidden bg-[#0a0e17]">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-12">
@@ -12,13 +17,13 @@ export const StatusChecklistSection: React.FC = () => {
         <div className="text-center max-w-3xl mx-auto space-y-4">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold tracking-wide">
             <CheckCircle2 className="w-3.5 h-3.5" />
-            <span>Готовность Продукта</span>
+            <span>{t.status.badge}</span>
           </div>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight font-['Outfit']">
-            Текущее Состояние <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">NovaBoost</span>
+            {t.status.title}
           </h2>
           <p className="text-slate-400 text-base sm:text-lg leading-relaxed">
-            Прозрачный аудит готовности компонентов, серверной базы, юридического пакета и зарегистрированных цифровых активов.
+            {t.status.subtitle}
           </p>
         </div>
 
@@ -80,7 +85,9 @@ export const StatusChecklistSection: React.FC = () => {
           <div className="flex items-center gap-3">
             <Shield className="w-6 h-6 text-cyan-400 shrink-0" />
             <span className="text-slate-300">
-              Базовая инфраструктура развернута. Проект готов к финализации публичного релиза в рамках средств Seed-раунда.
+              {language === 'ru' 
+                ? 'Базовая инфраструктура развернута. Проект готов к финализации публичного релиза в рамках средств Seed-раунда.'
+                : 'Core infrastructure deployed. Platform ready for public release rollout.'}
             </span>
           </div>
           <span className="font-mono text-cyan-300 font-bold shrink-0 hidden sm:inline-block">
